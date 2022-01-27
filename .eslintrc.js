@@ -7,5 +7,6 @@ module.exports = {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
     'react-hooks/exhaustive-deps': ['warn'],
+    'react/react-in-jsx-scope': ['error'],
   },
 };

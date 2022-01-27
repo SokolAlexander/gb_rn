@@ -36,7 +36,7 @@ export const TodoList = () => {
 
   const handleComplete = useCallback(
     id => {
-      const todoToChange = todos[id];
+      const todoToChange = {...todos[id], completed: !todos[id].completed};
       dispatch(changeTodo(todoToChange));
       // setTodos(prevTodos =>
       //   prevTodos.map(todo =>
@@ -55,7 +55,7 @@ export const TodoList = () => {
   return (
     <ScrollView contentContainerStyle={styles.todosContainer}>
       {Object.values(todos).map(todo => (
-        <View key={todo.id} style={styles.todoContainer}>
+        <View key={`${todo.id}-${todo.title}`} style={styles.todoContainer}>
           <Checkbox
             id={todo.id}
             onPress={handleComplete}
