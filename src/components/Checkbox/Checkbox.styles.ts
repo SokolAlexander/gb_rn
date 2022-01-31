@@ -2,15 +2,19 @@ import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
   root: {
-    width: 60,
-    height: 60,
-    borderRadius: 5,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
     borderColor: '#453489',
   },
   inner: {
-    height: '100%',
-    width: '100%',
+    flex: 1,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: '#453489',
   },
 });

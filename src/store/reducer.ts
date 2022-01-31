@@ -6,6 +6,7 @@ import {
   FetchStatus,
   FetchTodosSuccessAction,
   ChangeTodoAction,
+  DeleteTodoAction,
 } from './types';
 
 const DEFAULT_STATE: TodosState = {
@@ -39,6 +40,15 @@ const todosReducer = (state = DEFAULT_STATE, action: Action): TodosState => {
           ...state.todos,
           [typedAction.todo.id]: typedAction.todo,
         },
+      };
+    }
+    case ActionType.DeleteTodo: {
+      const typedAction = action as DeleteTodoAction;
+      const newTodos = {...state.todos};
+      delete newTodos[typedAction.id];
+      return {
+        ...state,
+        todos: newTodos,
       };
     }
     default:

@@ -1,17 +1,53 @@
-import React from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import React, {useRef} from 'react';
+import {View, Animated} from 'react-native';
 import {styles} from './Checkbox.styles';
 
 import {CheckboxProps} from './Checkbox.types';
 
 export const Checkbox = ({checked, onPress, id}: CheckboxProps) => {
+  const checkboxScale = useRef(new Animated.Value(0));
+
   const handlePress = () => {
     onPress(id);
+    Animated.spring(checkboxScale.current, {
+      toValue: 1,
+      damping: 10,
+      useNativeDriver: false,
+    }).start(() => {
+      checkboxScale.current.setValue(0);
+    });
+    // Animated.timing(checkboxScale.current, {
+    //   toValue: 1.2,
+    //   useNativeDriver: false,
+    //   // tension: 10,
+    //   duration: 300,
+    // }).start(() => {
+    //   Animated.timing(checkboxScale.current, {
+    //     toValue: 1,
+    //     useNativeDriver: false,
+    //     duration: 400,
+    //     easing: Easing.bounce,
+    //   }).start();
+    // });
   };
 
   return (
-    <TouchableOpacity style={styles.root} onPress={handlePress}>
+    <Animated.View
+      onTouchEnd={handlePress}
+      style={[
+        styles.root,
+        {
+          transform: [
+            {
+              scale: checkboxScale.current.interpolate({
+                inputRange: [0, 0.7, 1],
+                outputRange: [1, 1.2, 1],
+              }),
+            },
+          ],
+        },
+      ]}>
       {checked && <View style={styles.inner} />}
-    </TouchableOpacity>
+    </Animated.View>
   );
 };

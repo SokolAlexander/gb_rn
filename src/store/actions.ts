@@ -4,6 +4,7 @@ import {TodoItem} from '../screens/TodoList/TodoList.types';
 import {
   ActionType,
   ChangeTodoAction,
+  DeleteTodoAction,
   FetchTodosFailureAction,
   FetchTodosSuccessAction,
   TodosMap,
@@ -51,4 +52,9 @@ export const fetchTodos =
 export const changeTodo = (todo: TodoItem): ChangeTodoAction => ({
   type: ActionType.ChangeTodo,
   todo,
+});
+
+export const deleteTodo = (id: string): DeleteTodoAction => ({
+  type: ActionType.DeleteTodo,
+  id,
 });

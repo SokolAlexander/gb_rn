@@ -3,15 +3,16 @@ import React, {
   useEffect,
   //useState
 } from 'react';
-import {ScrollView, Text, View, Pressable} from 'react-native';
+import {ScrollView} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 
 // import {config} from '../../config';
-// import {TodoItem} from './TodoList.types';
+import {TodoItem} from './TodoList.types';
 import {styles} from './TodoList.styles';
-import {Checkbox} from '../../components/Checkbox/Checkbox';
-import {useDispatch, useSelector} from 'react-redux';
 import {selectTodos} from '../../store/selectors';
-import {changeTodo, fetchTodos} from '../../store/actions';
+import {changeTodo, deleteTodo, fetchTodos} from '../../store/actions';
+import {TextField} from '../../components/TextField/TextField';
+import {TodoElement} from '../../components/TodoElement/TodoElement';
 
 export const TodoList = () => {
   // const [todos, setTodos] = useState<TodoItem[]>([]);
@@ -52,26 +53,31 @@ export const TodoList = () => {
     [todos, dispatch],
   );
 
+  const addTodo = (text: string) => {
+    const newTodo: TodoItem = {
+      title: text,
+      id: `todo-${Date.now()}`,
+      completed: false,
+    };
+    dispatch(changeTodo(newTodo));
+  };
+
+  const removeTodo = (id: string) => {
+    dispatch(deleteTodo(id));
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.todosContainer}>
-      {Object.values(todos).map(todo => (
-        <View key={`${todo.id}-${todo.title}`} style={styles.todoContainer}>
-          <Checkbox
-            id={todo.id}
-            onPress={handleComplete}
-            checked={todo.completed}
+      <TextField onSubmit={addTodo} />
+      {Object.values(todos)
+        .reverse()
+        .map(todo => (
+          <TodoElement
+            todo={todo}
+            onSelect={handleComplete}
+            onDelete={removeTodo}
           />
-          <Pressable onPress={() => handleComplete(todo.id)}>
-            <Text
-              style={[
-                styles.todoText,
-                todo.completed && styles.todoTextCrossed,
-              ]}>
-              {todo.title}
-            </Text>
-          </Pressable>
-        </View>
-      ))}
+        ))}
     </ScrollView>
   );
 };
