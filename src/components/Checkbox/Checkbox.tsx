@@ -8,13 +8,13 @@ export const Checkbox = ({checked, onPress, id}: CheckboxProps) => {
   const checkboxScale = useRef(new Animated.Value(0));
 
   const handlePress = () => {
-    onPress(id);
     Animated.spring(checkboxScale.current, {
       toValue: 1,
       damping: 10,
       useNativeDriver: false,
     }).start(() => {
       checkboxScale.current.setValue(0);
+      onPress(id);
     });
     // Animated.timing(checkboxScale.current, {
     //   toValue: 1.2,
