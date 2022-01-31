@@ -3,7 +3,13 @@ import React, {
   useEffect,
   //useState
 } from 'react';
-import {ScrollView} from 'react-native';
+import {
+  FlatList,
+  ListRenderItem,
+  ListRenderItemInfo,
+  ScrollView,
+  View,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 // import {config} from '../../config';
@@ -66,18 +72,17 @@ export const TodoList = () => {
     dispatch(deleteTodo(id));
   };
 
+  const renderTodo = ({item}: ListRenderItemInfo<TodoItem>) => (
+    <TodoElement todo={item} onSelect={handleComplete} onDelete={removeTodo} />
+  );
+
   return (
-    <ScrollView contentContainerStyle={styles.todosContainer}>
-      <TextField onSubmit={addTodo} />
-      {Object.values(todos)
-        .reverse()
-        .map(todo => (
-          <TodoElement
-            todo={todo}
-            onSelect={handleComplete}
-            onDelete={removeTodo}
-          />
-        ))}
-    </ScrollView>
+    <View style={styles.todosContainer}>
+      <FlatList
+        ListHeaderComponent={() => <TextField onSubmit={addTodo} />}
+        data={Object.values(todos).reverse()}
+        renderItem={renderTodo}
+      />
+    </View>
   );
 };
