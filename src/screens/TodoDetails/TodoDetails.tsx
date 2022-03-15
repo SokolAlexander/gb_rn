@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Button, Image, Text, TextInput, View} from 'react-native';
+import {Button, Text, TextInput, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {launchImageLibrary} from 'react-native-image-picker';
 
@@ -8,6 +8,7 @@ import {changeTodo} from '../../store/actions';
 import {selectTodoById} from '../../store/selectors';
 import {styles} from './TodoDetails.styles';
 import {TodoDetailsProps} from './TodoDetails.types';
+import {SmallImage} from '../../components/SmallImage/SmallImage';
 
 export const TodoDetails = ({route, navigation}: TodoDetailsProps) => {
   const dispatch = useDispatch();
@@ -33,6 +34,10 @@ export const TodoDetails = ({route, navigation}: TodoDetailsProps) => {
         }
       },
     );
+  };
+
+  const openFullImage = (uri: string) => {
+    navigation.push('ImageFull', {todoId: todo.id, assetUri: uri});
   };
 
   const handleSave = useCallback(() => {
@@ -68,9 +73,7 @@ export const TodoDetails = ({route, navigation}: TodoDetailsProps) => {
       <Text>Attachments</Text>
       {todo.assets?.map(asset => {
         return (
-          <View key={asset.fileName}>
-            <Image source={{uri: asset.uri}} style={styles.image} />
-          </View>
+          <SmallImage key={asset.uri} asset={asset} onPress={openFullImage} />
         );
       })}
     </View>

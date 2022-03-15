@@ -6,6 +6,10 @@ export type RootStackParamList = {
   TodoDetails: {
     todoId: string;
   };
+  ImageFull: {
+    todoId: string;
+    assetUri: string;
+  };
 };
 
 type ScreenNavigationProp<T extends keyof RootStackParamList> =
