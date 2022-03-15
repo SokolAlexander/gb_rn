@@ -53,6 +53,7 @@ export const TodoList = ({navigation}: TodoListProps) => {
       title: text,
       id: `todo-${Date.now()}`,
       completed: false,
+      assets: [],
     };
     dispatch(changeTodo(newTodo));
   }, []);

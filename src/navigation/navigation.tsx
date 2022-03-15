@@ -14,9 +14,6 @@ export const RootNavigator = () => (
     <RootStack.Screen
       options={{
         title: 'Details',
-        headerStyle: {
-          flexDirection: 'row',
-        },
         headerTintColor: 'darkgrey',
         headerTitleStyle: {
           fontSize: 20,

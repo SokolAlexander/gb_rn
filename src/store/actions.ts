@@ -39,7 +39,7 @@ export const fetchTodos =
       const result: TodoItem[] = await response.json();
 
       const todos = result.reduce<TodosMap>((acc, todo) => {
-        acc[todo.id] = todo;
+        acc[todo.id] = {...todo, assets: []};
         return acc;
       }, {});
 
