@@ -1,21 +1,15 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  //useState
-} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import {ListRenderItemInfo, SectionList, Text, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
-// import {config} from '../../config';
-import {ListSection, TodoItem} from './TodoList.types';
+import {ListSection, TodoItem, TodoListProps} from './TodoList.types';
 import {styles} from './TodoList.styles';
 import {selectTodos} from '../../store/selectors';
 import {changeTodo, deleteTodo, fetchTodos} from '../../store/actions';
 import {TextField} from '../../components/TextField/TextField';
 import {TodoElement} from '../../components/TodoElement/TodoElement';
 
-export const TodoList = () => {
+export const TodoList = ({navigation}: TodoListProps) => {
   const todos = useSelector(selectTodos);
   const dispatch = useDispatch();
 
@@ -67,15 +61,23 @@ export const TodoList = () => {
     dispatch(deleteTodo(id));
   }, []);
 
+  const handleTodoPress = useCallback(
+    (id: string) => {
+      navigation.push('TodoDetails', {todoId: id});
+    },
+    [navigation],
+  );
+
   const renderTodo = useCallback(
     ({item}: ListRenderItemInfo<TodoItem>) => (
       <TodoElement
         todo={item}
         onSelect={handleComplete}
         onDelete={removeTodo}
+        onPress={handleTodoPress}
       />
     ),
-    [handleComplete, removeTodo],
+    [handleComplete, removeTodo, handleTodoPress],
   );
 
   const renderSectionHeader = useCallback(({section}) => {
