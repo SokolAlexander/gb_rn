@@ -1,6 +1,18 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
-import {ListRenderItemInfo, SectionList, Text, View} from 'react-native';
+import {
+  Button,
+  ListRenderItemInfo,
+  SectionList,
+  Text,
+  View,
+} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import notifee, {
+  AndroidImportance,
+  EventType,
+  TimestampTrigger,
+  TriggerType,
+} from '@notifee/react-native';
 
 import {ListSection, TodoItem, TodoListProps} from './TodoList.types';
 import {styles} from './TodoList.styles';
@@ -89,8 +101,103 @@ export const TodoList = ({navigation}: TodoListProps) => {
     );
   }, []);
 
+  useEffect(() => {
+    return notifee.onForegroundEvent(({type, detail}) => {
+      switch (type) {
+        case EventType.ACTION_PRESS: {
+          if (detail?.pressAction?.id === 'stop') {
+            notifee.stopForegroundService();
+            console.log(
+              'User pressed an action with the id: ',
+              detail.pressAction.id,
+            );
+          }
+          break;
+        }
+        case EventType.DISMISSED:
+          console.log('User dismissed notification', detail.notification);
+          break;
+        case EventType.PRESS:
+          console.log('User pressed notification', detail.notification);
+          break;
+      }
+    });
+  }, []);
+
+  const isAppOpenedByNotif = async () => {
+    const initNotif = await notifee.getInitialNotification();
+    if (initNotif) {
+      const {id} = initNotif.notification.data;
+      navigation.reset({
+        index: 0,
+        routes: [
+          {name: 'TodoList'},
+          {
+            name: 'TodoDetails',
+            params: {
+              todoId: id,
+            },
+          },
+        ],
+      });
+    }
+    console.log(initNotif);
+  };
+
+  useEffect(() => {
+    isAppOpenedByNotif();
+  }, []);
+
+  const sendPush = async () => {
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+      importance: AndroidImportance.HIGH,
+    });
+
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: Date.now() + 10000, // Через 10 секунд
+    };
+    await notifee.createTriggerNotification(
+      {
+        title: 'Notification Title',
+        body: 'Main body content of the notification',
+        android: {
+          channelId,
+          importance: AndroidImportance.HIGH,
+          asForegroundService: true,
+          pressAction: {
+            id: 'default',
+          },
+          actions: [
+            {
+              title: 'OK',
+              icon: 'https://my-cdn.com/icons/snooze.png',
+              pressAction: {
+                id: 'ok',
+                launchActivity: 'default',
+              },
+            },
+            {
+              title: 'Stop',
+              pressAction: {
+                id: 'stop',
+              },
+            },
+          ],
+        },
+        data: {
+          id: '1',
+        },
+      },
+      trigger,
+    );
+  };
+
   return (
     <View style={styles.todosContainer}>
+      <Button title="Send push" onPress={sendPush} />
       <SectionList
         ListHeaderComponent={() => <TextField onSubmit={addTodo} />}
         sections={sections}

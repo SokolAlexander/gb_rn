@@ -1,7 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Button, Text, TextInput, View} from 'react-native';
+import {Button, Switch, Text, TextInput, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {launchImageLibrary} from 'react-native-image-picker';
+import notifee, {
+  AndroidImportance,
+  RepeatFrequency,
+  TimestampTrigger,
+  TriggerType,
+} from '@notifee/react-native';
 
 import {SaveButton} from '../../components/SaveButton/SaveButton';
 import {changeTodo} from '../../store/actions';
@@ -16,6 +22,56 @@ export const TodoDetails = ({route, navigation}: TodoDetailsProps) => {
 
   const [text, setText] = useState(todo.title);
   const [isDirty, setIsDirty] = useState(false);
+
+  const handleSetPush = async () => {
+    const channelId = await notifee.createChannel({
+      id: 'default',
+      name: 'Default Channel',
+      importance: AndroidImportance.HIGH,
+    });
+
+    const date = new Date();
+    date.setHours(12);
+    date.setMinutes(0);
+    date.setSeconds(0);
+
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: date.getTime(),
+      repeatFrequency: RepeatFrequency.DAILY, // repeat once a week
+    };
+    await notifee.createTriggerNotification(
+      {
+        title: 'Notification Title',
+        body: 'Main body content of the notification',
+        android: {
+          channelId,
+          importance: AndroidImportance.HIGH,
+          asForegroundService: true,
+          pressAction: {
+            id: 'default',
+          },
+        },
+        data: {
+          id: todo.id,
+        },
+      },
+      trigger,
+    );
+  };
+
+  const handleCancelPush = async () => {
+    await notifee.cancelTriggerNotification(todo.id);
+  };
+
+  const handleSwitch = async () => {
+    if (todo.notificationIsOn) {
+      await handleCancelPush();
+    } else {
+      await handleSetPush();
+    }
+    dispatch(changeTodo({...todo, notificationIsOn: !todo.notificationIsOn}));
+  };
 
   const handleSelectImage = () => {
     launchImageLibrary(
@@ -69,6 +125,10 @@ export const TodoDetails = ({route, navigation}: TodoDetailsProps) => {
       <Text>Todo Details: {route.params.todoId}</Text>
       <Text>{todo.title}</Text>
       {todo.completed && <Text>Completed</Text>}
+      <View style={styles.switchWrapper}>
+        <Text>Notification</Text>
+        <Switch value={todo.notificationIsOn} onChange={handleSwitch} />
+      </View>
       <Button title="Add image" color="#ffc484" onPress={handleSelectImage} />
       <Text>Attachments</Text>
       {todo.assets?.map(asset => {

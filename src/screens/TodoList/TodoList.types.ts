@@ -7,6 +7,7 @@ export interface TodoItem {
   title: string;
   completed: boolean;
   readonly assets: Asset[];
+  notificationIsOn: boolean;
 }
 
 export type ListSection = {
