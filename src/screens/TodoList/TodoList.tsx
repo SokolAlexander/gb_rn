@@ -1,18 +1,7 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
-import {
-  Button,
-  ListRenderItemInfo,
-  SectionList,
-  Text,
-  View,
-} from 'react-native';
+import {ListRenderItemInfo, SectionList, Text, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import notifee, {
-  AndroidImportance,
-  EventType,
-  TimestampTrigger,
-  TriggerType,
-} from '@notifee/react-native';
+import notifee, {EventType} from '@notifee/react-native';
 
 import {ListSection, TodoItem, TodoListProps} from './TodoList.types';
 import {styles} from './TodoList.styles';
@@ -27,20 +16,22 @@ export const TodoList = ({navigation}: TodoListProps) => {
 
   const sections = useMemo(
     () =>
-      Object.values(todos).reduce<ListSection[]>(
-        (acc, todo) => {
-          if (!todo.completed) {
-            acc[0].data.push(todo);
-          } else {
-            acc[1].data.push(todo);
-          }
-          return acc;
-        },
-        [
-          {data: [], title: 'Todo'},
-          {data: [], title: 'Complete'},
-        ],
-      ),
+      Object.values(todos)
+        .slice(0, 10)
+        .reduce<ListSection[]>(
+          (acc, todo) => {
+            if (!todo.completed) {
+              acc[0].data.push(todo);
+            } else {
+              acc[1].data.push(todo);
+            }
+            return acc;
+          },
+          [
+            {data: [], title: 'Todo'},
+            {data: [], title: 'Complete'},
+          ],
+        ),
     [todos],
   );
 
@@ -66,6 +57,7 @@ export const TodoList = ({navigation}: TodoListProps) => {
       id: `todo-${Date.now()}`,
       completed: false,
       assets: [],
+      notificationIsOn: false,
     };
     dispatch(changeTodo(newTodo));
   }, []);
@@ -127,7 +119,7 @@ export const TodoList = ({navigation}: TodoListProps) => {
   const isAppOpenedByNotif = async () => {
     const initNotif = await notifee.getInitialNotification();
     if (initNotif) {
-      const {id} = initNotif.notification.data;
+      const {id} = initNotif.notification.data || {};
       navigation.reset({
         index: 0,
         routes: [
@@ -148,61 +140,29 @@ export const TodoList = ({navigation}: TodoListProps) => {
     isAppOpenedByNotif();
   }, []);
 
-  const sendPush = async () => {
-    const channelId = await notifee.createChannel({
-      id: 'default',
-      name: 'Default Channel',
-      importance: AndroidImportance.HIGH,
-    });
+  // const pan = useRef(new Animated.Value(0)).current;
 
-    const trigger: TimestampTrigger = {
-      type: TriggerType.TIMESTAMP,
-      timestamp: Date.now() + 10000, // Через 10 секунд
-    };
-    await notifee.createTriggerNotification(
-      {
-        title: 'Notification Title',
-        body: 'Main body content of the notification',
-        android: {
-          channelId,
-          importance: AndroidImportance.HIGH,
-          asForegroundService: true,
-          pressAction: {
-            id: 'default',
-          },
-          actions: [
-            {
-              title: 'OK',
-              icon: 'https://my-cdn.com/icons/snooze.png',
-              pressAction: {
-                id: 'ok',
-                launchActivity: 'default',
-              },
-            },
-            {
-              title: 'Stop',
-              pressAction: {
-                id: 'stop',
-              },
-            },
-          ],
-        },
-        data: {
-          id: '1',
-        },
-      },
-      trigger,
-    );
-  };
+  // const panResp = useRef(
+  //   PanResponder.create({
+  //     onMoveShouldSetPanResponder: () => true,
+  //     onPanResponderGrant: () => {
+  //       pan.setOffset(0);
+  //     },
+  //     onPanResponderMove: Animated.event([null, {dx: pan}]),
+  //     onPanResponderRelease: () => {
+  //       pan.flattenOffset();
+  //     },
+  //   }),
+  // );
 
   return (
     <View style={styles.todosContainer}>
-      <Button title="Send push" onPress={sendPush} />
       <SectionList
         ListHeaderComponent={() => <TextField onSubmit={addTodo} />}
         sections={sections}
         renderItem={renderTodo}
         renderSectionHeader={renderSectionHeader}
+        keyExtractor={({id}) => id}
       />
     </View>
   );

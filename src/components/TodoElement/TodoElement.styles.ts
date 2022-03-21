@@ -5,6 +5,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     margin: 8,
     alignItems: 'center',
+    borderBottomWidth: 2,
+    paddingBottom: 10,
   },
   todoText: {
     flexShrink: 1,
