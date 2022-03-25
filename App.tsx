@@ -3,18 +3,16 @@ import React from 'react';
 import {StatusBar} from 'react-native';
 import {Provider} from 'react-redux';
 
-import {RootNavigator} from './src/navigation/navigation';
+import {TabNav} from './src/navigation/navigation';
 import {store} from './src/store';
 
 const App = () => {
   return (
     <Provider store={store}>
-      {/* <SafeAreaView> */}
       <StatusBar />
       <NavigationContainer>
-        <RootNavigator />
+        <TabNav />
       </NavigationContainer>
-      {/* </SafeAreaView> */}
     </Provider>
   );
 };

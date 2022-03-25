@@ -9,5 +9,6 @@ export const styles = StyleSheet.create({
   sectionHeader: {
     marginVertical: 15,
     fontSize: 20,
+    fontFamily: 'Manrope-Bold',
   },
 });
